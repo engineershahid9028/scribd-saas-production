@@ -1,6 +1,5 @@
-import time
 import re
-import undetected_chromedriver as uc
+from playwright.sync_api import sync_playwright
 
 def download_scribd(url, output, progress):
     m = re.search(r"document/(\d+)", url)
@@ -10,21 +9,18 @@ def download_scribd(url, output, progress):
     doc_id = m.group(1)
     embed_url = f"https://www.scribd.com/embeds/{doc_id}/content"
 
-    options = uc.ChromeOptions()
-    options.add_argument("--headless")
-    options.add_argument("--no-sandbox")
-    options.add_argument("--disable-dev-shm-usage")
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=True)
+        page = browser.new_page()
+        page.goto(embed_url)
 
-    driver = uc.Chrome(options=options)
-    driver.get(embed_url)
+        for i in range(1, 21):
+            page.evaluate("window.scrollBy(0, document.body.scrollHeight)")
+            progress(i * 5)
+            page.wait_for_timeout(400)
 
-    for i in range(1, 21):
-        driver.execute_script("window.scrollBy(0,2000)")
-        progress(i * 5)
-        time.sleep(0.5)
+        pdf = page.pdf()
+        with open(output, "wb") as f:
+            f.write(pdf)
 
-    pdf = driver.execute_cdp_cmd("Page.printToPDF", {"printBackground": True})
-    with open(output, "wb") as f:
-        f.write(bytes.fromhex(pdf["data"]))
-
-    driver.quit()
+        browser.close()
