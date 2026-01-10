@@ -1,3 +1,4 @@
+print("🚀 Worker booting...")
 import os
 import sys
 import uuid
