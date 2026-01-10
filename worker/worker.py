@@ -61,9 +61,11 @@ while True:
         print("✅ Sent PDF to", user_id)
 
     except Exception as e:
-        print("❌ Download failed:", e)
-        try:
-            bot.send_message(chat_id=user_id, text=f"❌ Error: {e}")
+    import requests
+    requests.get(
+        f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage",
+        params={"chat_id": user_id, "text": f"❌ Error: {e}"}
+    )
         except:
             pass
 
