@@ -1,0 +1,10 @@
+app = "scribd-telegram-bot"
+
+[build]
+  dockerfile = "Dockerfile.bot"
+
+[env]
+  PYTHONUNBUFFERED = "1"
+
+[processes]
+  bot = "python bot/bot.py"
