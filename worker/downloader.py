@@ -5,6 +5,7 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from webdriver_manager.chrome import ChromeDriverManager
 
+
 def download_scribd(url, output, progress):
     m = re.search(r"document/(\d+)", url)
     if not m:
