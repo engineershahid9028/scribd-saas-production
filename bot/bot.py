@@ -9,7 +9,7 @@ API_URL = "https://scribd-saas-production.fly.dev/job"
 app = Application.builder().token(BOT_TOKEN).build()
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text("Send /download <url>")
+    await update.message.reply_text("Send:\n/download <url>")
 
 async def download(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not context.args:
