@@ -3,12 +3,14 @@ app = "scribd-saas-production"
 [build]
   dockerfile = "Dockerfile"
 
-[http_service]
-  internal_port = 8080
-  force_https = true
-
 [env]
   PYTHONUNBUFFERED = "1"
 
 [processes]
+  web = "uvicorn api.main:app --host 0.0.0.0 --port 8080"
   worker = "python worker/worker.py"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  processes = ["web"]
