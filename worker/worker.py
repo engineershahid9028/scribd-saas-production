@@ -43,11 +43,16 @@ while True:
 
     def progress(p):
         try:
-            bot.edit_message_text(
-                chat_id=user_id,
-                message_id=msg_id,
-                text=f"⏳ Downloading... {p}%"
-            )
+            import requests
+requests.get(
+    f"https://api.telegram.org/bot{BOT_TOKEN}/editMessageText",
+    params={
+        "chat_id": user_id,
+        "message_id": msg_id,
+        "text": f"⏳ Downloading... {p}%"
+    }
+)
+
         except Exception as e:
             print("Progress update failed:", e)
 
