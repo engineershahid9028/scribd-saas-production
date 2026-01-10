@@ -1,0 +1,10 @@
+fastapi
+uvicorn
+pyrogram
+tgcrypto
+python-dotenv
+psycopg2-binary
+redis
+selenium
+webdriver-manager
+requests
