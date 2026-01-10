@@ -1,30 +1,50 @@
-print("🚀 Worker booting...")
 import os
 import sys
 import uuid
+import json
+import requests
 from dotenv import load_dotenv
 
-# Make sure we can import local files and project root
+# Paths so imports work on Railway
 CURRENT_DIR = os.path.dirname(__file__)
 PROJECT_ROOT = os.path.dirname(CURRENT_DIR)
 sys.path.append(CURRENT_DIR)
 sys.path.append(PROJECT_ROOT)
 
-from telegram import Bot
-bot = Bot(token=BOT_TOKEN)
 from api.queue import get_job
 from downloader import download_scribd
 
-# Load env
 load_dotenv()
 
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 if not BOT_TOKEN:
     raise RuntimeError("❌ BOT_TOKEN is not set")
 
-bot = Bot(token=BOT_TOKEN)
-
+print("🚀 Worker booting...")
 print("✅ Worker started and waiting for jobs...")
+
+def tg_edit(chat_id, msg_id, text):
+    requests.get(
+        f"https://api.telegram.org/bot{BOT_TOKEN}/editMessageText",
+        params={"chat_id": chat_id, "message_id": msg_id, "text": text},
+        timeout=30
+    )
+
+def tg_send(chat_id, text):
+    requests.get(
+        f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage",
+        params={"chat_id": chat_id, "text": text},
+        timeout=30
+    )
+
+def tg_send_file(chat_id, filepath):
+    with open(filepath, "rb") as f:
+        requests.post(
+            f"https://api.telegram.org/bot{BOT_TOKEN}/sendDocument",
+            data={"chat_id": chat_id},
+            files={"document": f},
+            timeout=120
+        )
 
 while True:
     job = get_job()
@@ -40,39 +60,25 @@ while True:
         continue
 
     filename = f"{uuid.uuid4()}.pdf"
+    print("📥 Processing:", url)
 
     def progress(p):
         try:
-            import requests
-requests.get(
-    f"https://api.telegram.org/bot{BOT_TOKEN}/editMessageText",
-    params={
-        "chat_id": user_id,
-        "message_id": msg_id,
-        "text": f"⏳ Downloading... {p}%"
-    }
-)
-
+            tg_edit(user_id, msg_id, f"⏳ Downloading... {p}%")
         except Exception as e:
             print("Progress update failed:", e)
 
     try:
-        print("📥 Processing:", url)
         download_scribd(url, filename, progress)
-
-        with open(filename, "rb") as f:
-            bot.send_document(chat_id=user_id, document=f)
-
+        tg_send_file(user_id, filename)
         print("✅ Sent PDF to", user_id)
 
     except Exception as e:
-    import requests
-    requests.get(
-        f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage",
-        params={"chat_id": user_id, "text": f"❌ Error: {e}"}
-    )
-        except:
-            pass
+        print("❌ Download failed:", e)
+        try:
+            tg_send(user_id, f"❌ Error: {e}")
+        except Exception as e2:
+            print("❌ Failed to notify user:", e2)
 
     finally:
         if os.path.exists(filename):
