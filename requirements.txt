@@ -1,9 +1,5 @@
-fastapi
-uvicorn
 python-telegram-bot==21.10
 python-dotenv
-psycopg2-binary
 redis
 selenium
 webdriver-manager
-requests
