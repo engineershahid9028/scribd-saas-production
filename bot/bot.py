@@ -1,7 +1,11 @@
 import os
 from telegram import Update
 from telegram.ext import Application, CommandHandler, ContextTypes
+import sys, os
+sys.path.append(os.path.dirname(os.path.dirname(__file__)))
+
 from api.queue import add_job
+
 from dotenv import load_dotenv
 
 load_dotenv()
