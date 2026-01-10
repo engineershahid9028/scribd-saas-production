@@ -1,11 +1,21 @@
-from pyrogram import Client, filters
 import os
+from telegram import Update
+from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
+from dotenv import load_dotenv
+
+load_dotenv()
 
 BOT_TOKEN = os.getenv("BOT_TOKEN")
-app = Client("bot", bot_token=BOT_TOKEN)
 
-@app.on_message(filters.command("start"))
-async def start(_, msg):
-    await msg.reply("Scribd SaaS Bot is running.")
+app = ApplicationBuilder().token(BOT_TOKEN).build()
 
-app.run()
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text("✅ Scribd SaaS Bot is running!")
+
+async def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text("Use /download <url>")
+
+app.add_handler(CommandHandler("start", start))
+app.add_handler(CommandHandler("help", help))
+
+app.run_polling()
