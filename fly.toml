@@ -9,3 +9,6 @@ app = "scribd-saas-production"
 
 [env]
   PYTHONUNBUFFERED = "1"
+
+[processes]
+  worker = "python worker/worker.py"
