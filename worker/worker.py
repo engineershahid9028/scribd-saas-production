@@ -9,6 +9,7 @@ from telegram import Bot
 from dotenv import load_dotenv
 
 load_dotenv()
+
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 bot = Bot(BOT_TOKEN)
 
@@ -25,7 +26,11 @@ while True:
     filename = f"{uuid.uuid4()}.pdf"
 
     def progress(p):
-        bot.edit_message_text(chat_id=user_id, message_id=msg_id, text=f"⏳ Downloading... {p}%")
+        bot.edit_message_text(
+            chat_id=user_id,
+            message_id=msg_id,
+            text=f"⏳ Downloading... {p}%"
+        )
 
     try:
         download_scribd(url, filename, progress)
