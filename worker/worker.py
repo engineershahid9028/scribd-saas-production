@@ -11,6 +11,7 @@ sys.path.append(CURRENT_DIR)
 sys.path.append(PROJECT_ROOT)
 
 from telegram import Bot
+bot = Bot(token=BOT_TOKEN)
 from api.queue import get_job
 from downloader import download_scribd
 
