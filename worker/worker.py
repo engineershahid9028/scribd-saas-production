@@ -1,3 +1,5 @@
+import subprocess
+subprocess.run(["python", "-m", "playwright", "install", "chromium"], check=True)
 import os
 import sys
 import uuid
