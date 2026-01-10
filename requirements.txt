@@ -6,3 +6,4 @@ redis
 selenium
 webdriver-manager
 requests
+undetected-chromedriver
