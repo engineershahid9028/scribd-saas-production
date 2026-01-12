@@ -1,43 +1,26 @@
 import os
 import time
-import uuid
-from api.queue import get_job
+from api.queue import pop_job
 from telegram import Bot
 
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 bot = Bot(BOT_TOKEN)
 
-print("🚀 Worker started and waiting for jobs...")
+print("🚀 Worker started")
 
 while True:
-    job = get_job()
+    print("⏳ Waiting for job...")
+    job = pop_job()
 
     if not job:
-        time.sleep(2)
         continue
 
+    print("📥 Job received:", job)
+
     user_id = job["user_id"]
-    url = job["url"]
 
-    print("📥 Processing job:", job)
+    bot.send_message(user_id, "✅ Worker received your job!")
 
-    try:
-        bot.send_message(user_id, "⏳ Processing your document...")
+    time.sleep(3)
 
-        # TEMP test download
-        for i in range(1, 6):
-            time.sleep(1)
-            bot.send_message(user_id, f"Progress: {i*20}%")
-
-        filename = f"{uuid.uuid4()}.pdf"
-        with open(filename, "w") as f:
-            f.write("Test PDF")
-
-        bot.send_document(user_id, open(filename, "rb"))
-
-    except Exception as e:
-        bot.send_message(user_id, f"❌ Error: {e}")
-
-    finally:
-        if os.path.exists(filename):
-            os.remove(filename)
+    bot.send_message(user_id, "🎉 Job finished successfully!")
